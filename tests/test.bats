@@ -33,6 +33,7 @@ setup() {
   ddev delete -Oy "${PROJNAME}" >/dev/null 2>&1 || true
   cd "${TESTDIR}"
   run ddev config --project-name="${PROJNAME}" --project-tld=ddev.site
+  run ddev add-on get ddev-kubernetes
   assert_success
   run ddev start -y
   assert_success
