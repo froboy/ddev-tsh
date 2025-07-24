@@ -11,6 +11,12 @@ This add-on integrates [Teleport](https://goteleport.com/) and `tsh` into your [
 
 ## Installation
 
+It is recommended to use this addon in conjunction with the [DDEV Kubernetes add-on](https://github.com/MurzNN/ddev-kubernetes).
+
+```shell
+ ddev add-on get MurzNN/ddev-kubernetes
+```
+
 During installation, you will be asked to input your Teleport username, proxy, cluster, and k8s cluster (if applicable). You can skip any if you don't need them or don't know them yet.
 
 ```bash
