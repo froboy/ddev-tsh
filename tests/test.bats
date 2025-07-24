@@ -18,6 +18,12 @@ setup() {
   # Override this variable for your add-on:
   export GITHUB_REPO=froboy/ddev-tsh
 
+  # Set environment variables for Bats
+  export TELEPORT_USER="testuser"
+  export TELEPORT_PROXY="teleport.example.com:443"
+  export TELEPORT_CLUSTER="teleport.example.com"
+  export TELEPORT_KUBE_CLUSTER="test-kube-cluster"
+
   TEST_BREW_PREFIX="$(brew --prefix 2>/dev/null || true)"
   export BATS_LIB_PATH="${BATS_LIB_PATH}:${TEST_BREW_PREFIX}/lib:/usr/lib/bats"
   bats_load_library bats-assert
