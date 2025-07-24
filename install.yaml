@@ -1,13 +1,13 @@
 name: tsh
 
 project_files:
-  - .ddev/commands/web/
-  - .ddev/commands/web-build/
+  - .ddev/commands/web/tsh
+  - .ddev/commands/web/tsh-login
+  - .ddev/commands/web-build/Dockerfile.tsh
   - .ddev/config.tsh.yaml
 
 dependencies:
-  - name: ddev-kubernetes
-    repo: https://github.com/MurzNN/ddev-kubernetes
+  - ddev-kubernetes
 
 ddev_version_constraint: '>= v1.24.3'
 
