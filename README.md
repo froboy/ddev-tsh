@@ -11,7 +11,7 @@ This add-on integrates [Teleport](https://goteleport.com/) and its command line 
 
 ## Installation
 
-It is recommended to use this addon in conjunction with the [DDEV Kubernetes add-on](https://github.com/MurzNN/ddev-kubernetes).
+It is recommended to use this add-on in conjunction with the [DDEV Kubernetes add-on](https://github.com/MurzNN/ddev-kubernetes).
 
 ```shell
  ddev add-on get MurzNN/ddev-kubernetes
