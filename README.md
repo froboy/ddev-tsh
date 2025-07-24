@@ -7,7 +7,7 @@
 
 ## Overview
 
-This add-on integrates [Teleport](https://goteleport.com/) and `tsh` into your [DDEV](https://ddev.com/) project.
+This add-on integrates [Teleport](https://goteleport.com/) and its command line tool, [tsh](https://goteleport.com/docs/connect-your-client/tsh/) into your [DDEV](https://ddev.com/) project.
 
 ## Installation
 
