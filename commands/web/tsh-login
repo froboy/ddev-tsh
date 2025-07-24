@@ -11,7 +11,7 @@ if [ -z ${TELEPORT_USER} ] || [ -z ${TELEPORT_PROXY} ] || [ -z ${TELEPORT_CLUSTE
   echo "For example, set user globally: "
   echo "  ddev config global --web-environment-add=TELEPORT_USER=<user>"
   echo "then set proxy, cluster, and kube cluster for the project: "
-  echo "  ddev config --web-environment-add=TELEPORT_PROXY=<proxy>,TELEPORT_CLUSTER=<cluster>,TELEPORT_KUBE_CLUSTER=<kube-cluster>"
+  echo "  ddev dotenv set .ddev/.env.web --teleport_proxy=$TELEPORT_PROXY --teleport-cluster=$TELEPORT_CLUSTER --teleport-kube-cluster=$TELEPORT_KUBE_CLUSTER"
   exit 1
 fi
 

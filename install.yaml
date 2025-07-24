@@ -12,16 +12,16 @@ dependencies:
 ddev_version_constraint: '>= v1.24.3'
 
 post_install_actions:
-  - exec: |
-      read -p "Enter your Teleport username. This will be saved in DDEV global config: " TELEPORT_USER
-      read -p "Enter your Teleport proxy and port, like 'teleport.myserver.com:443': " TELEPORT_PROXY
-      read -p "Enter your Teleport cluster, like 'teleport.myserver.com': " TELEPORT_CLUSTER
-      read -p "Enter your Teleport Kubernetes cluster: " TELEPORT_KUBE_CLUSTER
+  - |
+    read -p "Enter your Teleport username. This will be saved in DDEV global config: " TELEPORT_USER
+    read -p "Enter your Teleport proxy and port, like 'teleport.myserver.com:443': " TELEPORT_PROXY
+    read -p "Enter your Teleport cluster, like 'teleport.myserver.com': " TELEPORT_CLUSTER
+    read -p "Enter your Teleport Kubernetes cluster: " TELEPORT_KUBE_CLUSTER
 
-      # Set TELEPORT_USER as a DDEV global variable
-      ddev config global --set TELEPORT_USER="$TELEPORT_USER"
+    # Set TELEPORT_USER as a DDEV global variable
+    ddev config global --web-environment-add=TELEPORT_USER=$TELEPORT_USER
 
-      # Write the other variables to .env.web
-      ddev dotenv set .ddev/.env.web --teleport_proxy=$TELEPORT_PROXY --teleport-cluster=$TELEPORT_CLUSTER --teleport-kube-cluster=$TELEPORT_KUBE_CLUSTER
+    # Write the other variables to .env.web
+    ddev dotenv set .ddev/.env.web --teleport_proxy=$TELEPORT_PROXY --teleport-cluster=$TELEPORT_CLUSTER --teleport-kube-cluster=$TELEPORT_KUBE_CLUSTER
 
-      echo "Variables set successfully. Run 'ddev restart' to use the new config."
+    echo "Variables set successfully. Run 'ddev restart' to use the new config."
