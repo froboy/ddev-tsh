@@ -1,10 +1,10 @@
 name: tsh
 
 project_files:
-  - .ddev/commands/web/tsh
-  - .ddev/commands/web/tsh-login
-  - .ddev/commands/web-build/Dockerfile.tsh
-  - .ddev/config.tsh.yaml
+  - commands/web/tsh
+  - commands/web/tsh-login
+  - commands/web-build/Dockerfile.tsh
+  - config.tsh.yaml
 
 dependencies:
   - ddev-kubernetes
