@@ -1,0 +1,21 @@
+#ddev-generated
+## Install Teleport in the ddev web container
+## As per https://goteleport.com/docs/installation/linux/
+
+# Temporary switch to the ddev user to install utils in the userspace.
+USER $uid
+
+ARG TELEPORT_PROXY=${TELEPORT_PROXY}
+
+RUN echo "Installing Teleport from ${TELEPORT_PROXY:-latest release}"
+
+RUN if [ -n "${TELEPORT_PROXY}" ]; then \
+    curl "https://${TELEPORT_PROXY}/scripts/install.sh" | bash ; \
+  else \
+    TELEPORT_EDITION="oss"; \
+    TELEPORT_VERSION="$(curl -s https://api.github.com/repos/gravitational/teleport/releases/latest | grep '\"tag_name\":' | sed -E 's/.*\"v?([0-9.]+)\".*/\1/')"; \
+    curl https://cdn.teleport.dev/install.sh | bash -s "${TELEPORT_VERSION?}" "${TELEPORT_EDITION?}"; \
+  fi
+
+# Revert back to root to not affect other commands.
+USER root

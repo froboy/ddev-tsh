@@ -1,0 +1,34 @@
+#ddev-generated
+#!/usr/bin/env bash
+
+## Description: Log in to Teleport and our project cluster.
+## Usage: tsh-login
+## Example: "ddev tsh-login"
+
+if [ -z ${TELEPORT_USER} ] || [ -z ${TELEPORT_PROXY} ] || [ -z ${TELEPORT_CLUSTER} ] || [ -z ${TELEPORT_KUBE_CLUSTER} ]; then
+  echo "TELEPORT_USER, TELEPORT_PROXY, TELEPORT_CLUSTER, and TELEPORT_KUBE_CLUSTER environment variables must be set." >&2
+  echo "See docs for how to set them." >&2
+  echo "For example, set user globally: "
+  echo "  ddev config global --web-environment-add=TELEPORT_USER=<user>"
+  echo "then set proxy, cluster, and kube cluster for the project: "
+  echo "  ddev config --web-environment-add=TELEPORT_PROXY=<proxy>,TELEPORT_CLUSTER=<cluster>,TELEPORT_KUBE_CLUSTER=<kube-cluster>"
+  exit 1
+fi
+
+# These variables don't need to be specified since they already exist as
+# environment variables in the web container, but we set them here for clarity.
+tsh login --proxy=${TELEPORT_PROXY} --user=${TELEPORT_USER} ${TELEPORT_CLUSTER}
+
+# The cluster name here must always be passed.
+tsh kube login ${TELEPORT_KUBE_CLUSTER}
+
+kubectl version | grep "Server Version" >/dev/null 2>&1
+kubestatus=$?
+
+## If `tsh kube version` outputs successfully, then the login was successful.
+if [ ${kubestatus} -eq 0 ]; then
+  echo "Successfully logged in to Teleport and Kubernetes cluster."
+else
+  echo "Failed to log in to Teleport or Kubernetes cluster."
+  exit 1
+fi
