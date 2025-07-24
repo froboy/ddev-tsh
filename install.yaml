@@ -3,7 +3,7 @@ name: tsh
 project_files:
   - commands/web/tsh
   - commands/web/tsh-login
-  - commands/web-build/Dockerfile.tsh
+  - web-build/Dockerfile.tsh
   - config.tsh.yaml
 
 dependencies:
