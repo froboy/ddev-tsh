@@ -19,9 +19,10 @@ post_install_actions:
     read -p "Enter your Teleport Kubernetes cluster: " TELEPORT_KUBE_CLUSTER
 
     # Set TELEPORT_USER as a DDEV global variable
-    ddev config global --web-environment-add=TELEPORT_USER=$TELEPORT_USER
+    [ -n "$TELEPORT_USER" ] && ddev config global --web-environment-add=TELEPORT_USER=$TELEPORT_USER
 
     # Write the other variables to .env.web
-    ddev dotenv set .ddev/.env.web --teleport_proxy=$TELEPORT_PROXY --teleport-cluster=$TELEPORT_CLUSTER --teleport-kube-cluster=$TELEPORT_KUBE_CLUSTER
-
+    [ -n "$TELEPORT_PROXY" ] && ddev dotenv set .ddev/.env.web --teleport-proxy=$TELEPORT_PROXY
+    [ -n "$TELEPORT_CLUSTER" ] && ddev dotenv set .ddev/.env.web --teleport-cluster=$TELEPORT_CLUSTER
+    [ -n "$TELEPORT_KUBE_CLUSTER" ] && ddev dotenv set .ddev/.env.web --teleport-kube-cluster=$TELEPORT_KUBE_CLUSTER
     echo "Variables set successfully. Run 'ddev restart' to use the new config."
