@@ -7,42 +7,57 @@
 
 ## Overview
 
-This add-on integrates Tsh into your [DDEV](https://ddev.com/) project.
+This add-on integrates [Teleport](https://goteleport.com/) and its command line tool, [tsh](https://goteleport.com/docs/connect-your-client/tsh/) into your [DDEV](https://ddev.com/) project.
+
+Teleport is an open-source platform that provides secure access to SSH, Kubernetes, databases, and internal applications. The `tsh` command allows users to connect to infrastructure via Teleport and manage their resources. If your infrastructure is behind a Teleport proxy, this add-on allows you to:
+
+- use `tsh` commands directly within your DDEV project, and 
+- configure [drush aliases](https://www.drush.org/latest/site-aliases/#kubernetes) to connect to remote environments.
 
 ## Installation
 
+It is recommended to use this add-on in conjunction with the [DDEV Kubernetes add-on](https://github.com/MurzNN/ddev-kubernetes).
+
+```shell
+ ddev add-on get MurzNN/ddev-kubernetes
+```
+
+During installation, you will be asked to input your Teleport username, proxy, cluster, and k8s cluster (if applicable). You can skip any if you don't need them or don't know them yet.
+
 ```bash
 ddev add-on get froboy/ddev-tsh
 ddev restart
 ```
 
-After installation, make sure to commit the `.ddev` directory to version control.
+After installation, adjust any files for your project needs. Remove `#ddev-generated` from any files that you edit, as they will be overwritten on the next `ddev restart`.
 
 ## Usage
 
-| Command | Description |
-| ------- | ----------- |
-| `ddev describe` | View service status and used ports for Tsh |
-| `ddev logs -s tsh` | Check Tsh logs |
+| Command          | Description                                                                       |
+|------------------|-----------------------------------------------------------------------------------|
+| `ddev tsh`       | Passthrough for the [tsh](https://goteleport.com/docs/reference/cli/tsh/) command |
+| `ddev tsh-login` | Log in to a Teleport server and connect to a k8s cluster.                         |
 
 ## Advanced Customization
 
-To change the Docker image:
+If you are using drush aliases, you will want to set up a drush alias using `kubectl` to connect to your Teleport cluster. 
 
-```bash
-ddev dotenv set .ddev/.env.tsh --tsh-docker-image="busybox:stable"
-ddev add-on get froboy/ddev-tsh
-ddev restart
-```
+For example, in `drush/sites/example.site.yml`:
+```yaml
+my-site-k8s:
+  kubectl:
+    namespace: 'my-site'
+    resource: 'deploy/my-site'
+    container: 'php'
+    tty: true
+    interactive: true
+  paths:
+    drush-script: /path/to/project/vendor/bin/drush
+  uri: https://my-site.example.com/
+  ```
 
-Make sure to commit the `.ddev/.env.tsh` file to version control.
-
-All customization options (use with caution):
-
-| Variable | Flag | Default |
-| -------- | ---- | ------- |
-| `TSH_DOCKER_IMAGE` | `--tsh-docker-image` | `busybox:stable` |
+Please note that `tty` and `interactive` are set to `true` to allow for interactive commands via `tsh` in the container.
 
 ## Credits
 
-**Contributed and maintained by [@froboy](https://github.com/froboy)**
+**Contributed and maintained by [@froboy](https://github.com/froboy) for [ImageX](https://imagexmedia.com/)**

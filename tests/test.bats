@@ -18,6 +18,12 @@ setup() {
   # Override this variable for your add-on:
   export GITHUB_REPO=froboy/ddev-tsh
 
+  # Set environment variables for Bats
+  export TELEPORT_USER="testuser"
+  export TELEPORT_PROXY="teleport.example.com:443"
+  export TELEPORT_CLUSTER="teleport.example.com"
+  export TELEPORT_KUBE_CLUSTER="test-kube-cluster"
+
   TEST_BREW_PREFIX="$(brew --prefix 2>/dev/null || true)"
   export BATS_LIB_PATH="${BATS_LIB_PATH}:${TEST_BREW_PREFIX}/lib:/usr/lib/bats"
   bats_load_library bats-assert
@@ -33,23 +39,16 @@ setup() {
   ddev delete -Oy "${PROJNAME}" >/dev/null 2>&1 || true
   cd "${TESTDIR}"
   run ddev config --project-name="${PROJNAME}" --project-tld=ddev.site
+  run ddev add-on get MurzNN/ddev-kubernetes
   assert_success
   run ddev start -y
   assert_success
 }
 
 health_checks() {
-  # Do something useful here that verifies the add-on
-
-  # You can check for specific information in headers:
-  # run curl -sfI https://${PROJNAME}.ddev.site
-  # assert_output --partial "HTTP/2 200"
-  # assert_output --partial "test_header"
-
-  # Or check if some command gives expected output:
-  DDEV_DEBUG=true run ddev launch
+  run ddev exec tsh version
   assert_success
-  assert_output --partial "FULLURL https://${PROJNAME}.ddev.site"
+  assert_output --partial "Teleport v"
 }
 
 teardown() {

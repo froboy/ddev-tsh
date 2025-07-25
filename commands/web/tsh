@@ -1,0 +1,8 @@
+#ddev-generated
+#!/bin/bash
+
+## Description: Run the Teleport shell (tsh) command inside the web container.
+## Usage: tsh [flags] <command> [<args> ...]
+## Example: "ddev tsh"
+
+tsh $@
