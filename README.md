@@ -9,6 +9,11 @@
 
 This add-on integrates [Teleport](https://goteleport.com/) and its command line tool, [tsh](https://goteleport.com/docs/connect-your-client/tsh/) into your [DDEV](https://ddev.com/) project.
 
+Teleport is an open-source platform that provides secure access to SSH, Kubernetes, databases, and internal applications. The `tsh` command allows users to connect to infrastructure via Teleport and manage their resources. If your infrastructure is behind a Teleport proxy, this add-on allows you to:
+
+- use `tsh` commands directly within your DDEV project, and 
+- configure [drush aliases](https://www.drush.org/latest/site-aliases/#kubernetes) to connect to remote environments.
+
 ## Installation
 
 It is recommended to use this add-on in conjunction with the [DDEV Kubernetes add-on](https://github.com/MurzNN/ddev-kubernetes).
@@ -24,7 +29,7 @@ ddev add-on get froboy/ddev-tsh
 ddev restart
 ```
 
-After installation, adjust any files for your project needs.
+After installation, adjust any files for your project needs. Remove `#ddev-generated` from any files that you edit, as they will be overwritten on the next `ddev restart`.
 
 ## Usage
 

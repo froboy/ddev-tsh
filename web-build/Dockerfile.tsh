@@ -10,11 +10,11 @@ ARG TELEPORT_PROXY=${TELEPORT_PROXY}
 RUN echo "Installing Teleport from ${TELEPORT_PROXY:-latest release}"
 
 RUN if [ -n "${TELEPORT_PROXY}" ]; then \
-    curl "https://${TELEPORT_PROXY}/scripts/install.sh" | bash ; \
+    curl -fsSL "https://${TELEPORT_PROXY}/scripts/install.sh" | bash ; \
   else \
     TELEPORT_EDITION="oss"; \
-    TELEPORT_VERSION="$(curl -s https://api.github.com/repos/gravitational/teleport/releases/latest | grep '\"tag_name\":' | sed -E 's/.*\"v?([0-9.]+)\".*/\1/')"; \
-    curl https://cdn.teleport.dev/install.sh | bash -s "${TELEPORT_VERSION?}" "${TELEPORT_EDITION?}"; \
+    TELEPORT_VERSION="$(curl -fsSL https://api.github.com/repos/gravitational/teleport/releases/latest | grep '\"tag_name\":' | sed -E 's/.*\"v?([0-9.]+)\".*/\1/')"; \
+    curl -fsSL https://cdn.teleport.dev/install.sh | bash -s "${TELEPORT_VERSION?}" "${TELEPORT_EDITION?}"; \
   fi
 
 # Revert back to root to not affect other commands.

@@ -1,4 +1,6 @@
 #ddev-generated
+## This file may need to be modified to suit your Teleport configuration.
+## If you modify the file, remove #ddev-generated from the first line.
 #!/usr/bin/env bash
 
 ## Description: Log in to Teleport and our project cluster.
