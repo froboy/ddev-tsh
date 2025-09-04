@@ -7,7 +7,7 @@ project_files:
   - config.tsh.yaml
 
 dependencies:
-  - ddev-kubernetes
+  - MurzNN/ddev-kubernetes
 
 ddev_version_constraint: '>= v1.24.3'
 
