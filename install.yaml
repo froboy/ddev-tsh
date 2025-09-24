@@ -14,13 +14,13 @@ ddev_version_constraint: '>= v1.24.3'
 post_install_actions:
   - |
     # Prompt the user for Teleport configuration if it's not already set.
-    [ -n "${TELEPORT_USER:-}" ] && read -p "Enter your Teleport username. This will be saved in DDEV global config: " TELEPORT_USER
-    [ -n "${TELEPORT_PROXY:-}" ] && read -p "Enter your Teleport proxy and port, like 'teleport.myserver.com:443': " TELEPORT_PROXY
-    [ -n "${TELEPORT_CLUSTER:-}" ] && read -p "Enter your Teleport cluster, like 'teleport.myserver.com': " TELEPORT_CLUSTER
-    [ -n "${TELEPORT_KUBE_CLUSTER:-}" ] && read -p "Enter your Teleport Kubernetes cluster: " TELEPORT_KUBE_CLUSTER
+    [ -z "${TELEPORT_USER:-}" ] && read -p "Enter your Teleport username. This will be saved in DDEV global config: " TELEPORT_USER
+    [ -z "${TELEPORT_PROXY:-}" ] && read -p "Enter your Teleport proxy and port, like 'teleport.myserver.com:443': " TELEPORT_PROXY
+    [ -z "${TELEPORT_CLUSTER:-}" ] && read -p "Enter your Teleport cluster, like 'teleport.myserver.com': " TELEPORT_CLUSTER
+    [ -z "${TELEPORT_KUBE_CLUSTER:-}" ] && read -p "Enter your Teleport Kubernetes cluster: " TELEPORT_KUBE_CLUSTER
 
     # Set TELEPORT_USER as a DDEV global variable.
-    [ -n "$TELEPORT_USER" ] && ddev config global --web-environment-add=TELEPORT_USER="$TELEPORT_USER"
+    [ -n "$TELEPORT_USER" ] && ddev config global --web-environment-add="TELEPORT_USER=$TELEPORT_USER"
 
     # Write the other variables to .env.web.
     [ -n "$TELEPORT_PROXY" ] && ddev dotenv set .ddev/.env.web --teleport-proxy="$TELEPORT_PROXY"
