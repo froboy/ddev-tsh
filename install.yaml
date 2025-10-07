@@ -11,19 +11,79 @@ dependencies:
 
 ddev_version_constraint: '>= v1.24.3'
 
-post_install_actions:
+pre_install_actions:
+  # Get TELEPORT_USER from user if we don't have it yet
   - |
-    # Prompt the user for Teleport configuration if it's not already set.
-    [ -z "${TELEPORT_USER:-}" ] && read -p "Enter your Teleport username. This will be saved in DDEV global config: " TELEPORT_USER
-    [ -z "${TELEPORT_PROXY:-}" ] && read -p "Enter your Teleport proxy and port, like 'teleport.myserver.com:443': " TELEPORT_PROXY
-    [ -z "${TELEPORT_CLUSTER:-}" ] && read -p "Enter your Teleport cluster, like 'teleport.myserver.com': " TELEPORT_CLUSTER
-    [ -z "${TELEPORT_KUBE_CLUSTER:-}" ] && read -p "Enter your Teleport Kubernetes cluster: " TELEPORT_KUBE_CLUSTER
+    #ddev-nodisplay
+    if ( {{ contains "TELEPORT_USER" (list .DdevGlobalConfig.web_environment | toString) }} || {{ contains "TELEPORT_USER" (list .DdevProjectConfig.web_environment | toString) }} ); then
+      echo "Using existing TELEPORT_USER."
+    else
+      printf "\n\nPlease enter your Teleport username: "
+    fi
 
-    # Set TELEPORT_USER as a DDEV global variable.
-    [ -n "$TELEPORT_USER" ] && ddev config global --web-environment-add="TELEPORT_USER=$TELEPORT_USER"
+  - |
+    #ddev-nodisplay
+    #ddev-description:Setting TELEPORT_USER
+    if !( {{ contains "TELEPORT_USER" (list .DdevGlobalConfig.web_environment | toString) }} || {{ contains "TELEPORT_USER" (list .DdevProjectConfig.web_environment | toString) }} ); then
+      read token
+      # Put the token into the global web environment
+      ddev config global --web-environment-add TELEPORT_USER=${token}
+      echo "TELEPORT_USER set globally"
+    fi
+    
+  # Get CUSTOMER_NAME from user if we don't have it yet
+  - |
+    #ddev-nodisplay
+    if [ "$(ddev dotenv get .ddev/.env.web --customer-name)" != "" ]; then
+      echo "Using existing CUSTOMER_NAME from .env.web."
+    else
+      printf "\n\nPlease enter your customer name (like 'my-example'): "
+    fi
 
-    # Write the other variables to .env.web.
-    [ -n "$TELEPORT_PROXY" ] && ddev dotenv set .ddev/.env.web --teleport-proxy="$TELEPORT_PROXY"
-    [ -n "$TELEPORT_CLUSTER" ] && ddev dotenv set .ddev/.env.web --teleport-cluster="$TELEPORT_CLUSTER"
-    [ -n "$TELEPORT_KUBE_CLUSTER" ] && ddev dotenv set .ddev/.env.web --teleport-kube-cluster="$TELEPORT_KUBE_CLUSTER"
-    echo "Variables set successfully. Run 'ddev restart' to use the new config."
+  - |
+    #ddev-nodisplay
+    #ddev-description:Setting CUSTOMER_NAME
+    if [ "$(ddev dotenv get .ddev/.env.web --customer-name)" = "" ]; then
+      read customer_name
+      echo "customer_name = '${customer_name}'"
+      ddev dotenv set .ddev/.env.web --customer-name=${customer_name}
+    fi
+
+  # Get TELEPORT_BASE from user if we don't have it yet
+  - |
+    #ddev-nodisplay
+    if [ "$(ddev dotenv get .ddev/.env.web --teleport-base)" != "" ]; then
+      echo "Using existing TELEPORT_BASE from .env.web."
+    else
+      printf "\n\nPlease enter your Teleport base domain (like 'teleport.example.com'): "
+    fi
+
+  - |
+    #ddev-nodisplay
+    #ddev-description:Set TELEPORT_BASE
+    if [ "$(ddev dotenv get .ddev/.env.web --teleport-base)" = "" ]; then
+      read teleport_base
+      echo "teleport_base = '${teleport_base}'"
+      ddev dotenv set .ddev/.env.web --teleport-base=${teleport_base}
+    fi
+
+  # Get KUBE_CLUSTER_BASE from user if we don't have it yet
+  - |
+    #ddev-nodisplay
+    if [ "$(ddev dotenv get .ddev/.env.web --kube-cluster-base)" != "" ]; then
+      echo "Using existing KUBE_CLUSTER_BASE from .env.web."
+    else
+      printf "\n\nPlease enter your Kubernetes cluster base (like 'example-cluster'): "
+    fi
+
+  - |
+    #ddev-nodisplay
+    #ddev-description:Set KUBE_CLUSTER_BASE
+    if [ "$(ddev dotenv get .ddev/.env.web --kube-cluster-base)" = "" ]; then
+      read kube_cluster_base
+      echo "kube_cluster_base = '${kube_cluster_base}'"
+      ddev dotenv set .ddev/.env.web --kube-cluster-base=${kube_cluster_base}
+    fi
+
+post_install_actions:
+  - echo "Addon configured successfully. Run 'ddev restart' to use the new config."
