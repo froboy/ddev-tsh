@@ -19,10 +19,10 @@ setup() {
   export GITHUB_REPO=froboy/ddev-tsh
 
   # Set environment variables for Bats
-  export TELEPORT_USER="testuser"
-  export TELEPORT_BASE="teleport.example.com"
-  export KUBE_CLUSTER_BASE="test-kube-cluster"
-  export CUSTOMER_NAME="test-customer"
+  run ddev config global --web-environment-add="TELEPORT_USER=testuser"
+  run ddev dotenv set .ddev/.env.web --customer-name=test-customer
+  run ddev dotenv set .ddev/.env.web --teleport-base=teleport.example.com
+  run ddev dotenv set .ddev/.env.web --kube-cluster-base=test-kube-cluster
 
   TEST_BREW_PREFIX="$(brew --prefix 2>/dev/null || true)"
   export BATS_LIB_PATH="${BATS_LIB_PATH}:${TEST_BREW_PREFIX}/lib:/usr/lib/bats"
