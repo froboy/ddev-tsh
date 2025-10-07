@@ -1,4 +1,23 @@
 #ddev-generated
+# These variables should generally not need to be changed. If you do need to
+# change them, remove the #ddev-generated line to prevent them from being
+# overwritten by ddev.
+##
+# The referenced environment variables MUST be set in .ddev/.env.web or another
+# .env file, as they need to exist before ddev reads this file.
+web_environment:
+  # These are used by tsh and tsh-login scripts.
+  - TELEPORT_PROXY=${TELEPORT_BASE:-teleport.example.com}:443
+  - TELEPORT_CLUSTER=${TELEPORT_BASE:-teleport.example.com}
+  # These are per-project and used in our own scripts.
+  - KUBE_CLUSTER_DEV=stg-${KUBE_CLUSTER_BASE:-example-cluster}
+  - KUBE_CLUSTER_STG=stg-${KUBE_CLUSTER_BASE:-example-cluster}
+  - KUBE_CLUSTER_PRD=prd-${KUBE_CLUSTER_BASE:-example-cluster}
+  - KUBE_NAMESPACE_DEV=${CUSTOMER_NAME:-example-customer}-dev
+  - KUBE_NAMESPACE_STG=${CUSTOMER_NAME:-example-customer}-stg
+  - KUBE_NAMESPACE_PRD=${CUSTOMER_NAME:-example-customer}-prd
+
+# Remind the user to run `ddev tsh-login` after `ddev start`.
 hooks:
   post-start:
-    - exec-host: ddev tsh-login
+    - exec-host: echo "Remember to run 'ddev tsh-login' to authenticate with Teleport."

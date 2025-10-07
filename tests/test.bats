@@ -18,12 +18,6 @@ setup() {
   # Override this variable for your add-on:
   export GITHUB_REPO=froboy/ddev-tsh
 
-  # Set environment variables for Bats
-  export TELEPORT_USER="testuser"
-  export TELEPORT_PROXY="teleport.example.com:443"
-  export TELEPORT_CLUSTER="teleport.example.com"
-  export TELEPORT_KUBE_CLUSTER="test-kube-cluster"
-
   TEST_BREW_PREFIX="$(brew --prefix 2>/dev/null || true)"
   export BATS_LIB_PATH="${BATS_LIB_PATH}:${TEST_BREW_PREFIX}/lib:/usr/lib/bats"
   bats_load_library bats-assert
@@ -39,6 +33,13 @@ setup() {
   ddev delete -Oy "${PROJNAME}" >/dev/null 2>&1 || true
   cd "${TESTDIR}"
   run ddev config --project-name="${PROJNAME}" --project-tld=ddev.site
+
+  # Set environment variables for Bats
+  run ddev config global --web-environment-add="TELEPORT_USER=testuser"
+  run ddev dotenv set .ddev/.env.web --customer-name=test-customer
+  run ddev dotenv set .ddev/.env.web --teleport-base=teleport.example.com
+  run ddev dotenv set .ddev/.env.web --kube-cluster-base=test-kube-cluster
+
   run ddev add-on get MurzNN/ddev-kubernetes
   assert_success
   run ddev start -y
