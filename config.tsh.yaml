@@ -12,10 +12,10 @@ web_environment:
   # These are per-project and used in our own scripts.
   - KUBE_CLUSTER_DEV=stg-${KUBE_CLUSTER_BASE:-example-cluster}
   - KUBE_CLUSTER_STG=stg-${KUBE_CLUSTER_BASE:-example-cluster}
-  - KUBE_CLUSTER_PRD=prod-${KUBE_CLUSTER_BASE:-example-cluster}
+  - KUBE_CLUSTER_PRD=prd-${KUBE_CLUSTER_BASE:-example-cluster}
   - KUBE_NAMESPACE_DEV=${CUSTOMER_NAME:-example-customer}-dev
   - KUBE_NAMESPACE_STG=${CUSTOMER_NAME:-example-customer}-stg
-  - KUBE_NAMESPACE_PROD=${CUSTOMER_NAME:-example-customer}-prd
+  - KUBE_NAMESPACE_PRD=${CUSTOMER_NAME:-example-customer}-prd
 
 # Remind the user to run `ddev tsh-login` after `ddev start`.
 hooks:
