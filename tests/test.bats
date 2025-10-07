@@ -20,9 +20,9 @@ setup() {
 
   # Set environment variables for Bats
   export TELEPORT_USER="testuser"
-  export TELEPORT_PROXY="teleport.example.com:443"
-  export TELEPORT_CLUSTER="teleport.example.com"
-  export TELEPORT_KUBE_CLUSTER="test-kube-cluster"
+  export TELEPORT_BASE="teleport.example.com"
+  export KUBE_CLUSTER_BASE="test-kube-cluster"
+  export CUSTOMER_NAME="test-customer"
 
   TEST_BREW_PREFIX="$(brew --prefix 2>/dev/null || true)"
   export BATS_LIB_PATH="${BATS_LIB_PATH}:${TEST_BREW_PREFIX}/lib:/usr/lib/bats"
