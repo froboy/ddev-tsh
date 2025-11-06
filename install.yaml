@@ -34,7 +34,7 @@ pre_install_actions:
   # Get CUSTOMER_NAME from user if we don't have it yet
   - |
     #ddev-nodisplay
-    if [ "$(ddev dotenv get .ddev/.env.web --customer-name)" != "" ]; then
+    if [ -f .ddev/.env.web ] && [ "$(ddev dotenv get .ddev/.env.web --customer-name)" != "" ]; then
       echo "Using existing CUSTOMER_NAME from .env.web."
     else
       printf "\n\nPlease enter your customer name (like 'my-example'): "
@@ -43,7 +43,7 @@ pre_install_actions:
   - |
     #ddev-nodisplay
     #ddev-description:Setting CUSTOMER_NAME
-    if [ "$(ddev dotenv get .ddev/.env.web --customer-name)" = "" ]; then
+    if [ ! -f .ddev/.env.web ] || [ "$(ddev dotenv get .ddev/.env.web --customer-name)" = "" ]; then
       read customer_name
       echo "customer_name = '${customer_name}'"
       ddev dotenv set .ddev/.env.web --customer-name=${customer_name}
@@ -52,7 +52,7 @@ pre_install_actions:
   # Get TELEPORT_BASE from user if we don't have it yet
   - |
     #ddev-nodisplay
-    if [ "$(ddev dotenv get .ddev/.env.web --teleport-base)" != "" ]; then
+    if ddev dotenv get .ddev/.env.web --teleport-base >/dev/null 2>&1 && [ "$(ddev dotenv get .ddev/.env.web --teleport-base)" != "" ]; then
       echo "Using existing TELEPORT_BASE from .env.web."
     else
       printf "\n\nPlease enter your Teleport base domain (like 'teleport.example.com'): "
@@ -61,7 +61,7 @@ pre_install_actions:
   - |
     #ddev-nodisplay
     #ddev-description:Set TELEPORT_BASE
-    if [ "$(ddev dotenv get .ddev/.env.web --teleport-base)" = "" ]; then
+    if ! ddev dotenv get .ddev/.env.web --teleport-base >/dev/null 2>&1 || [ "$(ddev dotenv get .ddev/.env.web --teleport-base 2>/dev/null)" = "" ]; then
       read teleport_base
       echo "teleport_base = '${teleport_base}'"
       ddev dotenv set .ddev/.env.web --teleport-base=${teleport_base}
@@ -70,7 +70,7 @@ pre_install_actions:
   # Get KUBE_CLUSTER_BASE from user if we don't have it yet
   - |
     #ddev-nodisplay
-    if [ "$(ddev dotenv get .ddev/.env.web --kube-cluster-base)" != "" ]; then
+    if ddev dotenv get .ddev/.env.web --kube-cluster-base >/dev/null 2>&1 && [ "$(ddev dotenv get .ddev/.env.web --kube-cluster-base)" != "" ]; then
       echo "Using existing KUBE_CLUSTER_BASE from .env.web."
     else
       printf "\n\nPlease enter your Kubernetes cluster base (like 'example-cluster'): "
@@ -79,7 +79,7 @@ pre_install_actions:
   - |
     #ddev-nodisplay
     #ddev-description:Set KUBE_CLUSTER_BASE
-    if [ "$(ddev dotenv get .ddev/.env.web --kube-cluster-base)" = "" ]; then
+    if ! ddev dotenv get .ddev/.env.web --kube-cluster-base >/dev/null 2>&1 || [ "$(ddev dotenv get .ddev/.env.web --kube-cluster-base 2>/dev/null)" = "" ]; then
       read kube_cluster_base
       echo "kube_cluster_base = '${kube_cluster_base}'"
       ddev dotenv set .ddev/.env.web --kube-cluster-base=${kube_cluster_base}
