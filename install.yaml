@@ -34,7 +34,7 @@ pre_install_actions:
   # Get CUSTOMER_NAME from user if we don't have it yet
   - |
     #ddev-nodisplay
-    if [ -f .ddev/.env.web ] && [ "$(ddev dotenv get .ddev/.env.web --customer-name)" != "" ]; then
+    if [ -f .ddev/.env.web ] && [ "$(ddev dotenv get .ddev/.env.web --customer-name 2>/dev/null)" != "" ]; then
       echo "Using existing CUSTOMER_NAME from .env.web."
     else
       printf "\n\nPlease enter your customer name (like 'my-example'): "
@@ -43,7 +43,7 @@ pre_install_actions:
   - |
     #ddev-nodisplay
     #ddev-description:Setting CUSTOMER_NAME
-    if [ ! -f .ddev/.env.web ] || [ "$(ddev dotenv get .ddev/.env.web --customer-name)" = "" ]; then
+    if [ ! -f .ddev/.env.web ] || ! ddev dotenv get .ddev/.env.web --customer-name >/dev/null 2>&1 || [ "$(ddev dotenv get .ddev/.env.web --customer-name 2>/dev/null)" = "" ]; then
       read customer_name
       echo "customer_name = '${customer_name}'"
       ddev dotenv set .ddev/.env.web --customer-name=${customer_name}
