@@ -1,21 +1,26 @@
 #ddev-generated
-## Install Teleport in the ddev web container
+## Install Teleport in the ddev web container.
 ## As per https://goteleport.com/docs/installation/linux/
+##
+## When TELEPORT_PROXY is set, the client version is pinned to the proxy's
+## major.minor by asking the proxy's public /webapi/ping endpoint. This avoids
+## client/proxy skew bugs (e.g. 18.7.x client against an 18.6.x proxy caused
+## `kubectl cp` stream corruption against EKS kube agents in our environment).
 
 # Temporary switch to the ddev user to install utils in the userspace.
 USER $uid
 
 ARG TELEPORT_PROXY=${TELEPORT_PROXY}
 
-RUN echo "Installing Teleport from ${TELEPORT_PROXY:-latest release}"
-
 RUN if [ -n "${TELEPORT_PROXY}" ]; then \
-    curl -fsSL "https://${TELEPORT_PROXY}/scripts/install.sh" | bash ; \
+    TELEPORT_VERSION="$(curl -fsSL --connect-timeout 5 "https://${TELEPORT_PROXY}/webapi/ping" | grep -o '"server_version":"[^"]*"' | cut -d'"' -f4)"; \
+    echo "Installing Teleport ${TELEPORT_VERSION} (matching proxy ${TELEPORT_PROXY})"; \
   else \
-    TELEPORT_EDITION="oss"; \
     TELEPORT_VERSION="$(curl -fsSL https://api.github.com/repos/gravitational/teleport/releases/latest | grep '\"tag_name\":' | sed -E 's/.*\"v?([0-9.]+)\".*/\1/')"; \
-    curl -fsSL https://cdn.teleport.dev/install.sh | bash -s "${TELEPORT_VERSION?}" "${TELEPORT_EDITION?}"; \
-  fi
+    echo "Installing Teleport ${TELEPORT_VERSION} (latest; no proxy configured)"; \
+  fi \
+  && TELEPORT_EDITION="oss" \
+  && curl -fsSL https://cdn.teleport.dev/install.sh | bash -s "${TELEPORT_VERSION?}" "${TELEPORT_EDITION?}"
 
 # Revert back to root to not affect other commands.
 USER root
