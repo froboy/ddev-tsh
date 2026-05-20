@@ -1,0 +1,63 @@
+#!/usr/bin/expect -f
+# ddev-generated - drives `tsh login` with creds read from stdin (pw\notp\n).
+#   - env: TELEPORT_PROXY, TELEPORT_USER, TELEPORT_CLUSTER (already set in the web container)
+#   - stdin: two lines, pw then otp
+#   - exits with tsh's status
+
+set timeout 30
+
+foreach var {TELEPORT_PROXY TELEPORT_USER TELEPORT_CLUSTER} {
+    if {![info exists env($var)] || $env($var) eq ""} {
+        puts stderr "$var is empty in the web container env. Aborting."
+        exit 2
+    }
+}
+set proxy   $env(TELEPORT_PROXY)
+set user    $env(TELEPORT_USER)
+set cluster $env(TELEPORT_CLUSTER)
+
+# Secrets via stdin so they never touch argv/env.
+gets stdin pw
+gets stdin otp
+if {$pw eq "" || $otp eq ""} {
+    puts stderr "password and OTP must be provided on stdin (two lines)"
+    exit 2
+}
+
+# Strip terminal queries (OSC ...(BEL|ST) and CSI ...n) so the terminal doesn't
+# reply with bytes that surface on screen via the tty echo.
+proc filter {s} {
+    regsub -all -- {\x1b\][^\x07\x1b]*(\x07|\x1b\\)} $s "" s
+    regsub -all -- {\x1b\[\??\d*(;\d+)*n} $s "" s
+    return $s
+}
+proc dump_filtered {} {
+    global expect_out
+    if {[info exists expect_out(buffer)]} {
+        puts -nonewline [filter $expect_out(buffer)]
+        flush stdout
+    }
+}
+
+# Silent during the credential-driving phase so query bytes don't leak out.
+log_user 0
+
+spawn -noecho tsh login --proxy=$proxy --user=$user --auth=local --mfa-mode=otp $cluster
+
+expect {
+    -nocase -re "password:?\\s*" { send -- "$pw\r" }
+    timeout                       { dump_filtered; puts stderr "\ntimeout waiting for password prompt"; exit 1 }
+    eof                           { dump_filtered; catch wait r; exit [lindex $r 3] }
+}
+
+expect {
+    -nocase -re "(otp|token|code):?\\s*" { send -- "$otp\r" }
+    timeout                               { dump_filtered; puts stderr "\ntimeout waiting for otp prompt"; exit 1 }
+    eof                                   { dump_filtered; catch wait r; exit [lindex $r 3] }
+}
+
+# Post-auth output (success message, kube login results) shows live.
+log_user 1
+expect eof
+catch wait result
+exit [lindex $result 3]

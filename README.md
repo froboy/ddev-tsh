@@ -46,10 +46,11 @@ As always, after install or modifying any config, run:
 
 ## Usage
 
-| Command          | Description                                                                       |
-|------------------|-----------------------------------------------------------------------------------|
-| `ddev tsh`       | Passthrough for the [tsh](https://goteleport.com/docs/reference/cli/tsh/) command |
-| `ddev tsh-login` | Log in to a Teleport server and connect to a k8s cluster.                         |
+| Command                 | Description                                                                              |
+|-------------------------|------------------------------------------------------------------------------------------|
+| `ddev tsh`              | Passthrough for the [tsh](https://goteleport.com/docs/reference/cli/tsh/) command        |
+| `ddev tsh-login [<env>]`| Log in to a Teleport server and connect to a k8s cluster (interactive prompt by default).|
+| `ddev tsh-login --op [<env>]` | Same, but pulls password + TOTP from 1Password for unattended login.   |
 
 ## Advanced Customization
 
