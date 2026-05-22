@@ -87,4 +87,4 @@ fi
 
 WEB_ENV=()
 [ "$USE_OP" = "1" ] && WEB_ENV=(env DDEV_TSH_SKIP_LOGIN=1)
-ddev exec "${WEB_ENV[@]}" bash /mnt/ddev_config/commands/web/tsh-login "${POSITIONAL[@]}"
+ddev exec "${WEB_ENV[@]+"${WEB_ENV[@]}"}" bash /mnt/ddev_config/commands/web/tsh-login "${POSITIONAL[@]+"${POSITIONAL[@]}"}"
