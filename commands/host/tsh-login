@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+#ddev-generated
+
+## Description: Log in to Teleport and connect to the project Kubernetes cluster. Pass --op to pull password + TOTP from 1Password for unattended login.
+## Usage: tsh-login [--op] [<env>]
+## Example: "ddev tsh-login --op dev"
+## Flags: [{"Name":"op","Usage":"pull Teleport password + TOTP from 1Password (host 'op' CLI) and drive tsh unattended","Type":"bool"}]
+## ExecRaw: false
+
+# With --op, this wrapper reads pw+TOTP from the host's 1Password CLI and drives `tsh login` via expect inside the container; the kube login + verify steps are delegated to the web `tsh-login` command (which also runs the whole flow on its own when --op is absent). DDEV_TSH_OP_PASSWORD_REF / DDEV_TSH_OP_OTP_ITEM override the 1Password item refs. Remove #ddev-generated above to make local edits stick.
+
+set -euo pipefail
+
+USE_OP=0
+POSITIONAL=()
+for arg in "$@"; do
+  case "$arg" in
+    --op) USE_OP=1 ;;
+    *)    POSITIONAL+=("$arg") ;;
+  esac
+done
+
+if [ "$USE_OP" = "1" ]; then
+  if ! command -v op >/dev/null 2>&1; then
+    cat >&2 <<EOF
+--op requested but the 1Password CLI ('op') is not installed on the host.
+Install it from https://developer.1password.com/docs/cli/get-started/ and run \`op signin\`, then retry.
+Continuing without 1Password — \`tsh\` will prompt for password and OTP.
+EOF
+    USE_OP=0
+  else
+    OP_PASSWORD_REF="${DDEV_TSH_OP_PASSWORD_REF:-op://Employee/Teleport/password}"
+    OP_OTP_ITEM="${DDEV_TSH_OP_OTP_ITEM:-Teleport}"
+    if ! OP_PW=$(op read "$OP_PASSWORD_REF" 2>/dev/null) \
+       || ! OP_OTP=$(op item get "$OP_OTP_ITEM" --otp 2>/dev/null) \
+       || [ -z "$OP_PW" ] || [ -z "$OP_OTP" ]; then
+      cat >&2 <<EOF
+--op requested but the 1Password lookup failed. Continuing without 1Password — \`tsh\` will prompt for password and OTP.
+
+To enable unattended login, set up a 1Password item that tsh-login can read:
+  1. Sign in to the CLI:           op signin
+  2. Create a Login item named 'Teleport' in your Employee vault, with:
+       - password field   : your Teleport password
+       - one-time password: scan/paste the Teleport TOTP secret (so 'op item get Teleport --otp' returns a 6-digit code)
+  3. Verify:
+       op read 'op://Employee/Teleport/password'
+       op item get Teleport --otp
+
+If your item lives elsewhere, override the defaults by setting these in your shell profile (~/.zshrc, ~/.bashrc, etc.):
+  export DDEV_TSH_OP_PASSWORD_REF="op://Vault/Item/password"
+  export DDEV_TSH_OP_OTP_ITEM="ItemName"
+EOF
+      USE_OP=0
+    fi
+  fi
+fi
+
+if [ "$USE_OP" = "1" ]; then
+  # Spinner during the silent-prompt window inside the expect helper.
+  SPIN=""
+  spin_cleanup() {
+    if [ -n "$SPIN" ] && kill -0 "$SPIN" 2>/dev/null; then
+      kill "$SPIN" 2>/dev/null || true
+      while kill -0 "$SPIN" 2>/dev/null; do :; done
+    fi
+  }
+  if [ -t 2 ]; then
+    (
+      trap 'printf "\r\033[K" >&2; exit 0' TERM INT
+      chars='⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏'; i=0
+      while :; do
+        printf '\r\033[K%s logging in to Teleport...' "${chars:$((i%10)):1}" >&2
+        i=$((i+1)); sleep 0.1
+      done
+    ) &
+    SPIN=$!
+    trap 'spin_cleanup' EXIT INT TERM
+  fi
+  printf '%s\n%s\n' "$OP_PW" "$OP_OTP" | ddev exec \
+    expect -f /mnt/ddev_config/tsh-login-pty-helper.exp 2>&1 | (
+      first=$(dd bs=1 count=1 2>/dev/null) || true
+      spin_cleanup
+      printf '%s' "$first"
+      cat
+    )
+fi
+
+WEB_ENV=()
+[ "$USE_OP" = "1" ] && WEB_ENV=(env DDEV_TSH_SKIP_LOGIN=1)
+ddev exec "${WEB_ENV[@]+"${WEB_ENV[@]}"}" bash /mnt/ddev_config/commands/web/tsh-login "${POSITIONAL[@]+"${POSITIONAL[@]}"}"

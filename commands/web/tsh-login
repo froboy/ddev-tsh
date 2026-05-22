@@ -55,7 +55,9 @@ fi
 
 # These variables don't need to be specified since they already exist as
 # environment variables in the web container, but we set them here for clarity.
-tsh login --proxy=${TELEPORT_PROXY} --user=${TELEPORT_USER} ${TELEPORT_CLUSTER}
+if [ "${DDEV_TSH_SKIP_LOGIN:-0}" != "1" ]; then
+  tsh login --proxy=${TELEPORT_PROXY} --user=${TELEPORT_USER} ${TELEPORT_CLUSTER}
+fi
 
 tsh kube login "$KUBE_CLUSTER_VALUE"
 

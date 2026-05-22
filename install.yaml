@@ -3,6 +3,8 @@ name: tsh
 project_files:
   - commands/web/tsh
   - commands/web/tsh-login
+  - commands/host/tsh-login
+  - tsh-login-pty-helper.exp
   - web-build/Dockerfile.tsh
   - config.tsh.yaml
 
