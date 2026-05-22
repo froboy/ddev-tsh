@@ -29,7 +29,7 @@ Continuing without 1Password — \`tsh\` will prompt for password and OTP.
 EOF
     USE_OP=0
   else
-    OP_PASSWORD_REF="${DDEV_TSH_OP_PASSWORD_REF:-op://Private/Teleport/password}"
+    OP_PASSWORD_REF="${DDEV_TSH_OP_PASSWORD_REF:-op://Employee/Teleport/password}"
     OP_OTP_ITEM="${DDEV_TSH_OP_OTP_ITEM:-Teleport}"
     if ! OP_PW=$(op read "$OP_PASSWORD_REF" 2>/dev/null) \
        || ! OP_OTP=$(op item get "$OP_OTP_ITEM" --otp 2>/dev/null) \
@@ -39,16 +39,16 @@ EOF
 
 To enable unattended login, set up a 1Password item that tsh-login can read:
   1. Sign in to the CLI:           op signin
-  2. Create a Login item named 'Teleport' in your Private vault, with:
+  2. Create a Login item named 'Teleport' in your Employee vault, with:
        - password field   : your Teleport password
        - one-time password: scan/paste the Teleport TOTP secret (so 'op item get Teleport --otp' returns a 6-digit code)
   3. Verify:
-       op read 'op://Private/Teleport/password'
+       op read 'op://Employee/Teleport/password'
        op item get Teleport --otp
 
-If your item lives elsewhere, override the defaults via env vars:
-  DDEV_TSH_OP_PASSWORD_REF   default: op://Private/Teleport/password
-  DDEV_TSH_OP_OTP_ITEM       default: Teleport
+If your item lives elsewhere, override the defaults by setting these in your shell profile (~/.zshrc, ~/.bashrc, etc.):
+  export DDEV_TSH_OP_PASSWORD_REF="op://Vault/Item/password"
+  export DDEV_TSH_OP_OTP_ITEM="ItemName"
 EOF
       USE_OP=0
     fi
