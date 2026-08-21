@@ -9,7 +9,7 @@
 
 # `expect` installed up front so users get the
 # 1Password-driven auto-login out of the box without webimage_extra_packages.
-RUN apt-get update && apt-get install -y --no-install-recommends expect \
+RUN apt-get update --allow-releaseinfo-change && apt-get install -y --no-install-recommends expect \
   && rm -rf /var/lib/apt/lists/*
 
 # Temporary switch to the ddev user to install utils in the userspace.
